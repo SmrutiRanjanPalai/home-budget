@@ -1,0 +1,134 @@
+📌 Project Scope: Personal Expense Tracking Mobile App (Flutter APK)
+1. Objective
+
+Develop a simple, reliable, and bug-free mobile application (Flutter APK) for two users (Smruti and Sajhni) to track and manage shared monthly expenses. The app must sync with a Google Sheet as the backend and maintain a structure identical to the predefined Excel layout.
+
+2. Core Functional Requirements
+2.1 Data Structure (Strict Schema)
+
+The app must follow this exact column structure:
+
+Month (auto-derived from date)
+Date
+Category (dropdown)
+Remark (text)
+Smruti Amount
+Sajhni Amount
+Total (auto-calculated)
+2.2 Input Flow (User Entry Screen)
+
+Each expense entry must follow this sequence:
+
+Date Field
+Default: Current date
+Editable via date picker
+Format: MM/DD/YYYY
+Category Dropdown
+Fixed options:
+Utility
+Groceries
+Petrol
+Outing
+Food-Order
+Trip
+Other
+No custom categories (to avoid scope creep)
+User Selection
+Options:
+Smruti
+Sajhni
+Mandatory selection
+Amount Input
+Numeric only
+No negative values
+Max 2 decimal places
+Remark Field
+Optional
+Free text input
+Max 100 characters (to avoid overflow issues)
+2.3 Business Logic
+Based on selected user:
+If Smruti selected → amount goes to Smruti column
+If Sajhni selected → amount goes to Sajhni column
+Other user column remains blank or 0
+Total = Smruti + Sajhni (auto-calculated in sheet or app)
+3. Google Sheets Integration
+3.1 Backend Setup
+Google Sheet acts as single source of truth
+Use Google Apps Script Web App API
+3.2 API Requirements
+POST API
+Accepts:
+Date
+Category
+Remark
+User (Smruti/Sajhni)
+Amount
+Writes data into correct row format
+GET API (optional for future)
+Fetch all entries for display (not mandatory in v1)
+3.3 Apps Script Behavior
+Append new row on every entry
+Automatically:
+Derive Month from Date
+Calculate Total
+Ensure:
+No duplicate writes
+No blank mandatory fields
+4. UI/UX Requirements
+Clean, minimal interface
+Single screen for entry (no multi-screen complexity)
+Dropdown-style category selector (like your screenshot)
+Input validation before submission
+Success message after entry
+5. Validation Rules (Strict)
+Date cannot be empty
+Category must be selected
+User must be selected
+Amount must be:
+
+0
+
+Numeric
+Prevent duplicate rapid submissions (double-click issue)
+6. Edge Cases & Loopholes Handling
+❌ No internet → show error, do not crash
+❌ API failure → retry option
+❌ Invalid API response → log + alert
+❌ Empty fields → block submission
+❌ Large inputs in remark → truncate
+❌ Concurrent entries → ensure row append consistency
+7. Non-Functional Requirements
+Lightweight APK
+Fast response (<2 seconds API call)
+No login/authentication (keep simple)
+Offline storage NOT required (avoid scope creep)
+No analytics/dashboard in v1
+8. Out of Scope (Important to Prevent Scope Creep)
+❌ Editing existing entries
+❌ Deleting entries
+❌ Charts / dashboards
+❌ Multi-user login system
+❌ Notifications
+❌ Expense splitting logic
+❌ Cloud database (only Google Sheets)
+9. Testing Scenarios
+Functional Tests
+Add entry for Smruti → correct column updated
+Add entry for Sajhni → correct column updated
+Total calculation correct
+Date editing works
+Edge Tests
+Submit without internet
+Submit with empty fields
+Submit invalid amount (text input)
+Rapid multiple clicks
+Integration Tests
+API writes correct row format
+No duplicate entries
+Month auto-populates correctly
+10. Success Criteria
+Every entry from app reflects correctly in Google Sheet
+No crashes during normal use
+No incorrect column mapping
+App usable daily without manual correction

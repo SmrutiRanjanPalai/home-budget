@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Track and manage shared monthly expenses for Smruti and Sajhni. Syncs directly to Google Sheets.">
+  <meta name="theme-color" content="#10B981">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Budget">
+
+  <title>Home Budget — Smruti &amp; Sajhni</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- App Icon (for browsers + iOS) -->
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- =========================================
+       HEADER
+       ========================================= -->
+  <header class="header">
+    <div class="header-logo" aria-hidden="true">💰</div>
+    <div class="header-info">
+      <h1>Home Budget</h1>
+      <p>Smruti &amp; Sajhni</p>
+    </div>
+    <button
+      class="icon-btn"
+      id="settingsBtn"
+      onclick="toggleSettings()"
+      aria-label="Toggle Settings"
+      aria-expanded="false"
+      title="Settings"
+    >⚙</button>
+  </header>
+
+  <!-- =========================================
+       OFFLINE BAR
+       ========================================= -->
+  <div class="offline-bar" id="offlineBar" role="alert" aria-live="polite">
+    📵 &nbsp;You're offline — entries cannot be saved until you reconnect
+  </div>
+
+  <!-- =========================================
+       SETTINGS PANEL
+       ========================================= -->
+  <div class="settings-panel" id="settingsPanel" role="region" aria-label="Settings">
+    <div class="settings-inner">
+      <p class="settings-title">⚙ Settings</p>
+
+      <label class="settings-label" for="apiUrl">Google Apps Script URL</label>
+      <p class="settings-hint">
+        Paste your Apps Script Web App URL here. See <strong>SETUP.md</strong> for step-by-step instructions.
+      </p>
+      <input
+        type="url"
+        class="api-input"
+        id="apiUrl"
+        placeholder="https://script.google.com/macros/s/..."
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <div class="settings-actions">
+        <button class="btn-primary-sm" onclick="saveSettings()" id="saveSettingsBtn">
+          💾 Save URL
+        </button>
+        <button class="btn-secondary-sm" onclick="testConnection()" id="testBtn">
+          🔗 Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       SETUP BANNER (first launch)
+       ========================================= -->
+  <div class="setup-banner hidden" id="setupBanner" role="alert">
+    <span class="setup-icon">🔧</span>
+    <div class="setup-text">
+      <strong>One-time setup needed</strong>
+      <span>Connect your Google Sheet to start tracking</span>
+    </div>
+    <button class="setup-cta" onclick="openSetup()">Setup</button>
+  </div>
+
+  <!-- =========================================
+       MAIN FORM
+       ========================================= -->
+  <main class="main" id="main">
+    <form id="expenseForm" novalidate autocomplete="off">
+
+      <!-- DATE + CATEGORY row -->
+      <p class="section-label">When &amp; What</p>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label class="form-label" for="date">
+          <span class="lbl-icon">📅</span> Date
+        </label>
+        <input
+          type="date"
+          class="form-input"
+          id="date"
+          name="date"
+          required
+          aria-required="true"
+          aria-describedby="dateError"
+        >
+        <span class="field-msg" id="dateError" role="alert"></span>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="form-label" for="category">
+          <span class="lbl-icon">📂</span> Category
+        </label>
+        <select
+          class="form-input"
+          id="category"
+          name="category"
+          required
+          aria-required="true"
+          aria-describedby="categoryError"
+        >
+          <option value="" disabled selected>Select a category…</option>
+          <option value="Utility">🔌 Utility</option>
+          <option value="Groceries">🛒 Groceries</option>
+          <option value="Petrol">⛽ Petrol</option>
+          <option value="Outing">🍽 Outing</option>
+          <option value="Food-Order">🛵 Food-Order</option>
+          <option value="Trip">✈️ Trip</option>
+          <option value="Other">📌 Other</option>
+        </select>
+        <span class="field-msg" id="categoryError" role="alert"></span>
+      </div>
+
+      <!-- WHO PAID -->
+      <p class="section-label">Who Paid?</p>
+
+      <div class="form-group">
+        <div class="user-grid" role="group" aria-label="Select who paid" aria-describedby="userError">
+          <button
+            type="button"
+            class="user-btn"
+            id="btnSmruti"
+            data-user="Smruti"
+            onclick="selectUser('Smruti')"
+            aria-pressed="false"
+          >
+            <span class="user-avatar">👩</span>
+            <span class="user-name">Smruti</span>
+            <span class="user-sub">Tap to select</span>
+            <span class="check-badge">✓</span>
+          </button>
+          <button
+            type="button"
+            class="user-btn"
+            id="btnSajhni"
+            data-user="Sajhni"
+            onclick="selectUser('Sajhni')"
+            aria-pressed="false"
+          >
+            <span class="user-avatar">👩</span>
+            <span class="user-name">Sajhni</span>
+            <span class="user-sub">Tap to select</span>
+            <span class="check-badge">✓</span>
+          </button>
+        </div>
+        <span class="field-msg" id="userError" role="alert"></span>
+      </div>
+
+      <!-- AMOUNT + REMARK -->
+      <p class="section-label">Amount &amp; Note</p>
+
+      <!-- Amount -->
+      <div class="form-group">
+        <label class="form-label" for="amount">
+          <span class="lbl-icon">💵</span> Amount
+        </label>
+        <div class="amount-wrapper">
+          <span class="currency-flag" aria-hidden="true">₹</span>
+          <input
+            type="number"
+            class="form-input amount-input"
+            id="amount"
+            name="amount"
+            placeholder="0.00"
+            min="0.01"
+            step="0.01"
+            inputmode="decimal"
+            required
+            aria-required="true"
+            aria-describedby="amountError"
+          >
+        </div>
+        <!-- Preview row -->
+        <div class="amount-preview" id="amountPreview" aria-live="polite">
+          <span class="preview-label">Entry for <strong id="previewUser"></strong></span>
+          <span class="preview-value" id="previewAmount"></span>
+        </div>
+        <span class="field-msg" id="amountError" role="alert"></span>
+      </div>
+
+      <!-- Remark -->
+      <div class="form-group">
+        <label class="form-label" for="remark">
+          <span class="lbl-icon">📝</span> Remark
+          <span class="optional-tag">optional</span>
+        </label>
+        <div class="remark-wrapper">
+          <textarea
+            class="form-input"
+            id="remark"
+            name="remark"
+            placeholder="Add a short note (e.g. Big Bazaar, weekend trip…)"
+            maxlength="100"
+            rows="3"
+            aria-describedby="charCounter"
+          ></textarea>
+          <span class="char-counter" id="charCounter" aria-label="Character count">0/100</span>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- =========================================
+       FIXED SUBMIT FOOTER
+       ========================================= -->
+  <div class="submit-footer" role="complementary">
+    <button
+      class="submit-btn"
+      id="submitBtn"
+      type="submit"
+      form="expenseForm"
+      aria-label="Save expense entry"
+    >
+      <span id="submitLabel"><span>💾</span> Save Expense</span>
+    </button>
+  </div>
+
+  <!-- =========================================
+       TOAST NOTIFICATION
+       ========================================= -->
+  <div class="toast-container" aria-live="assertive" aria-atomic="true">
+    <div class="toast" id="toast" role="status">
+      <span class="toast-icon" id="toastIcon"></span>
+      <div class="toast-body">
+        <div class="toast-title" id="toastTitle"></div>
+        <div class="toast-sub"   id="toastSub"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.app -->
+
+<!-- App Script -->
+<script src="./app.js"></script>
+
+</body>
+</html>

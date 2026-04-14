@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0A0F1E"/>
+  <!-- Gradient defs -->
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer wallet shape -->
+  <rect x="80" y="148" width="352" height="240" rx="28" fill="url(#g1)"/>
+  <!-- Wallet flap -->
+  <rect x="80" y="148" width="352" height="80" rx="28" fill="#059669"/>
+  <rect x="80" y="192" width="352" height="36" fill="#059669"/>
+  <!-- Card slot -->
+  <rect x="112" y="320" width="140" height="44" rx="10" fill="rgba(255,255,255,0.15)"/>
+  <!-- Coin pockets right -->
+  <circle cx="368" cy="310" r="38" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="368" cy="310" r="25" fill="rgba(255,255,255,0.18)"/>
+  <!-- Rupee symbol in coin -->
+  <text x="368" y="320" font-family="Arial, sans-serif" font-size="26" font-weight="700"
+        fill="white" text-anchor="middle">₹</text>
+  <!-- Shine overlay -->
+  <rect x="80" y="148" width="352" height="40" rx="28" fill="rgba(255,255,255,0.08)"/>
+</svg>
