@@ -1,13 +1,14 @@
 // ============================================
 // HOME BUDGET TRACKER - Service Worker
-// Version: 1.0
+// Version: 2.0 (V2 with Dashboard + History + Personal)
 // ============================================
 
-const CACHE_NAME = 'home-budget-v1';
+const CACHE_NAME = 'home-budget-v3';
 const ASSETS_TO_CACHE = [
   './index.html',
   './styles.css',
   './app.js',
+  './api.js',
   './manifest.json',
   './icon.svg'
 ];

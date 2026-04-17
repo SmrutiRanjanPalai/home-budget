@@ -1,6 +1,13 @@
-# 📱 Home Budget Tracker — Setup Guide
+# 📱 Home Budget Tracker V2 — Setup Guide
 
-Complete setup takes about **5 minutes**. Follow these steps once and the app runs forever.
+Complete setup takes about **5–10 minutes**. Follow these steps once and the app runs forever.
+
+**What's new in V2:**
+- 📊 Dashboard with charts (Category breakdown + Spending trend)
+- 🗒️ Expense History with Edit & Delete
+- 👤 Personal Expense Tracker (separate per-user tracker)
+- 🔍 Search and filter on History
+- 🆔 Unique row IDs — no wrong-row updates ever
 
 ---
 
@@ -34,22 +41,24 @@ Complete setup takes about **5 minutes**. Follow these steps once and the app ru
 
 ---
 
-### Step 4: Set Up Column Headers (Run Once)
+### Step 4: Set Up Sheets & Column Headers (Run Once)
 
-1. In the Apps Script editor, find the function dropdown at the top — it shows `doPost` by default
-2. **Change it** to `setupHeaders` using the dropdown
+1. In the Apps Script editor, find the **function dropdown** at the top (shows `doPost` by default)
+2. **Change it** to `setupHeadersV2` using the dropdown
 3. Click **▶ Run**
-4. A permissions dialog may appear → Click **Review permissions** → **Allow**
+4. A **permissions dialog** may appear → Click **Review permissions** → **Allow**
 5. You'll see a success popup in your Google Sheet ✅
+
+> **What this does:** Creates two sheets — **Expenses** (for shared costs) and **PersonalExpenses** (for individual tracking). The ID column in each sheet is automatically hidden.
 
 ---
 
 ### Step 5: Deploy as Web App
 
 1. In the Apps Script editor, click **Deploy** (top right) → **New deployment**
-2. Click the gear icon ⚙ next to "Select type" → choose **Web app**
+2. Click the **gear icon ⚙** next to "Select type" → choose **Web app**
 3. Fill in:
-   - **Description**: `Home Budget API v1`
+   - **Description**: `Home Budget API v2`
    - **Execute as**: `Me`
    - **Who has access**: `Anyone`
 4. Click **Deploy**
@@ -59,6 +68,8 @@ Complete setup takes about **5 minutes**. Follow these steps once and the app ru
    https://script.google.com/macros/s/AKfycb.../exec
    ```
    > ⚠️ Keep this URL safe. Anyone with it can add entries to your sheet.
+
+> **Updating the script later?** Always redeploy as a **New version**: Deploy → Manage deployments → ✏ Edit → Version: New version → Deploy.
 
 ---
 
@@ -70,7 +81,7 @@ Complete setup takes about **5 minutes**. Follow these steps once and the app ru
 2. Tap the **⚙ Settings** button (top right)
 3. Paste the Web App URL you copied
 4. Tap **💾 Save URL**
-5. Tap **🔗 Test** to verify — you should see "Connected! API is running"
+5. Tap **🔗 Test** to verify — you should see "Connected! API v2.0 is running"
 
 ---
 
@@ -131,19 +142,57 @@ To install as PWA on phones, the app must be on a real URL (HTTPS). Here are two
 | Issue | Fix |
 |-------|-----|
 | "Save Failed" error | Check internet connection; verify API URL in Settings |
-| "Connection Failed" on Test | Re-deploy the Apps Script (sometimes needed after changes) |
+| "Connection Failed" on Test | Re-deploy the Apps Script as a **New version** |
 | Data not appearing in Sheet | Open Apps Script → **Executions** to see error logs |
 | App won't install on phone | Must be on HTTPS (hosted URL, not a local file) |
-| Wrong column values in Sheet | Re-run `setupHeaders` and check column order |
+| Dashboard shows "Setup Required" | Open ⚙ Settings and add your API URL |
+| Edit/Delete buttons missing | Entry was added before V2 (legacy ID). Add new entries via the app. |
+| Can't edit old V1 entries | Run `setupHeadersV2` again — it auto-migrates old rows with IDs |
+| Charts don't show | No entries in the selected date range — add some expenses first |
 
 ---
 
-## Google Sheet Column Structure
+## Google Sheet Structure (V2)
 
-| A: Month | B: Date | C: Category | D: Remark | E: Smruti Amount | F: Sajhni Amount | G: Total |
-|----------|---------|-------------|-----------|------------------|------------------|---------|
-| April 2026 | 04/14/2026 | Groceries | Big Bazaar | 850.00 | | 850.00 |
-| April 2026 | 04/14/2026 | Petrol | | | 500.00 | 500.00 |
+### Expenses Sheet (Shared Costs)
+
+| A: ID (hidden) | B: Month | C: Date | D: Category | E: Remark | F: Smruti Amount | G: Sajhni Amount | H: Total |
+|----------------|----------|---------|-------------|-----------|------------------|------------------|---------|
+| lf2k4x-a3r7z | April 2026 | 04/17/2026 | Groceries | Big Bazaar | 850.00 | | 850.00 |
+| lf2k5y-b4s8w | April 2026 | 04/17/2026 | Petrol | | | 500.00 | 500.00 |
+
+### PersonalExpenses Sheet (Individual Tracker)
+
+| A: ID (hidden) | B: Month | C: Date | D: Category | E: Remark | F: Amount | G: User |
+|----------------|----------|---------|-------------|-----------|-----------|---------|
+| lf2k6z-c5t9x | April 2026 | 04/17/2026 | Food | Lunch | 250.00 | Smruti |
+| lf2k7a-d6u0y | April 2026 | 04/17/2026 | E-commerce | Amazon | 1200.00 | Sajhni |
+
+---
+
+## How to Use V2 Features
+
+### Adding Expenses (Add Tab ➕)
+- Same as before — pick date, category, who paid, amount, remark → Save
+- Both Smruti and Sajhni use the same app (no login needed)
+
+### Viewing Dashboard (Dashboard Tab 📊)
+- See total spend, individual totals, and transaction count
+- Category breakdown pie chart + spending trend line chart
+- Filter by: **This Month** | **Last 7 Days** | **Custom date range**
+
+### Viewing & Editing History (History Tab 🗒️)
+- **Common** mode: shared expenses — tap any row to edit or delete
+- **Personal** mode: individual tracker — tap any row to edit or delete
+- Search by remark or category using the search bar
+- Filter by category using the dropdown
+
+### Adding Personal Expenses
+1. Go to **History** tab
+2. Toggle to **Personal** mode
+3. Tap **+ Add Personal Expense**
+4. Fill in: Who (Smruti/Sajhni) → Date → Category (Food/E-commerce/Others) → Amount → Remark
+5. Tap **Save Personal Expense**
 
 ---
 

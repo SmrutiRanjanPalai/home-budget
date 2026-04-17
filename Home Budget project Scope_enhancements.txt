@@ -1,0 +1,198 @@
+V2 Scope: Enhanced Expense Tracking App
+📌 1. Objective (V2 Expansion)
+
+Enhance the existing app by adding:
+
+Dashboard & Analytics
+Editable Expense History
+Date Range Filtering
+Personal Expense Tracker (separate module)
+
+All features must remain simple, fast, and controlled — no feature bloat.
+
+📊 2. Feature 1: Dashboard Page (Common Expenses)
+2.1 Purpose
+
+Provide clear insights into spending patterns without overwhelming UI.
+
+2.2 Dashboard Components
+🔹 Summary Cards (Top Section)
+Total Spend (selected date range)
+Smruti Total
+Sajhni Total
+Number of Transactions
+🔹 Category-wise Spend (Graph)
+Pie Chart OR Bar Chart
+Shows:
+Utility
+Groceries
+Petrol
+Outing
+Food-Order
+Trip
+Other
+🔹 Spending Trend (Optional but useful)
+Line chart (Date vs Total Spend)
+2.3 Date Range Filter
+Default: Current Month
+Options:
+Last 7 days
+This Month
+Custom Range (Date Picker)
+2.4 Business Logic
+Filter applied on:
+All graphs
+Summary values
+Must be computed either:
+In Flutter (preferred for speed)
+OR via API (if dataset grows)
+📋 3. Feature 2: Expense History + Edit
+3.1 List View Page
+Display all entries in list/table format
+Columns:
+Date
+Category
+Remark
+Smruti
+Sajhni
+Total
+3.2 Functionalities
+🔹 Search & Filter
+By:
+Date range
+Category
+🔹 Edit Entry (NEW)
+
+User can:
+
+Modify:
+Date
+Category
+Amount
+User (Smruti/Sajhni)
+Remark
+3.3 Edit Logic
+Update the same row in Google Sheet
+Must use:
+Unique Row ID (MANDATORY in V2)
+3.4 Row Identification (Important Fix)
+
+Add a new hidden column in Sheet:
+
+ID (timestamp or UUID)
+
+This ensures:
+
+No wrong row updates
+No data corruption
+3.5 Delete Entry (Optional but recommended)
+Soft delete (mark row)
+OR hard delete via API
+👤 4. Feature 3: Personal Expense Tracker
+4.1 Purpose
+
+Track individual expenses separately from shared expenses.
+
+4.2 Structure
+
+Two modes:
+
+Toggle:
+Smruti
+Sajhni
+4.3 Data Schema (Separate Sheet Recommended)
+
+Columns:
+
+Month
+Date
+Category
+Remark
+Amount
+User (Smruti/Sajhni)
+4.4 Categories (Strict)
+Food
+E-commerce
+Others
+
+(No customization to prevent scope creep)
+
+4.5 Entry Flow
+
+Same as V1 with slight changes:
+
+Select User (Toggle)
+Date (default today)
+Category (limited list)
+Amount
+Remark
+4.6 Dashboard (Personal)
+Total Spend (per user)
+Category split (Pie chart)
+Date range filter
+🔄 5. API Enhancements (V2)
+5.1 New Endpoints
+🔹 Add Entry (same as V1)
+🔹 Get Entries
+With filters:
+Date range
+Type (common/personal)
+🔹 Update Entry (NEW)
+Requires:
+ID
+Updated fields
+🔹 Delete Entry (Optional)
+5.2 Performance Handling
+Limit API response size
+Use pagination if needed
+⚙️ 6. UI Navigation Structure
+
+Bottom Navigation (3 Tabs):
+
+Add Entry (V1 screen)
+Dashboard
+History / Personal Toggle
+
+Inside History:
+
+Toggle:
+Common
+Personal
+🧪 7. Testing Scope (V2 Critical)
+7.1 Dashboard Tests
+Correct totals for date range
+Graph accuracy
+7.2 Edit Tests
+Editing updates correct row
+No duplication
+ID mapping works
+7.3 Personal Tracker Tests
+Data separation from common tracker
+Correct user mapping
+7.4 Edge Cases
+Editing while offline
+API failure during update
+Large dataset loading
+Invalid date ranges
+🚫 8. Out of Scope (Still Controlled)
+❌ Multi-user login system
+❌ Cloud DB migration (still Google Sheets)
+❌ AI insights
+❌ Expense splitting automation
+❌ Notifications
+❌ Export to PDF/Excel
+🎯 9. Success Criteria (V2)
+Dashboard reflects accurate insights
+Edit functionality works 100% reliably
+No wrong row updates
+Personal & common data are clearly separated
+App remains fast and simple
+💡 Pro Tip (Important)
+
+If you don’t control this now, V2 can get messy fast.
+
+👉 Golden Rules:
+
+Add ID column first before anything
+Keep categories fixed
+Avoid “just one more feature” trap

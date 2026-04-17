@@ -9,87 +9,48 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Budget">
-
   <title>Home Budget — Smruti &amp; Sajhni</title>
-
-  <!-- PWA Manifest -->
   <link rel="manifest" href="./manifest.json">
-
-  <!-- App Icon (for browsers + iOS) -->
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-
 <div class="app" id="app">
 
-  <!-- =========================================
-       HEADER
-       ========================================= -->
+  <!-- ===================== HEADER ===================== -->
   <header class="header">
     <div class="header-logo" aria-hidden="true">💰</div>
     <div class="header-info">
-      <h1>Home Budget</h1>
+      <h1 id="pageTitle">Add Expense</h1>
       <p>Smruti &amp; Sajhni</p>
     </div>
-    <button
-      class="icon-btn"
-      id="settingsBtn"
-      onclick="toggleSettings()"
-      aria-label="Toggle Settings"
-      aria-expanded="false"
-      title="Settings"
-    >⚙</button>
+    <button class="icon-btn" id="settingsBtn" onclick="toggleSettings()" aria-label="Settings" title="Settings">⚙</button>
   </header>
 
-  <!-- =========================================
-       OFFLINE BAR
-       ========================================= -->
+  <!-- ===================== OFFLINE BAR ===================== -->
   <div class="offline-bar" id="offlineBar" role="alert" aria-live="polite">
-    📵 &nbsp;You're offline — entries cannot be saved until you reconnect
+    📵 &nbsp;You're offline — data cannot be saved or loaded
   </div>
 
-  <!-- =========================================
-       SETTINGS PANEL
-       ========================================= -->
+  <!-- ===================== SETTINGS PANEL ===================== -->
   <div class="settings-panel" id="settingsPanel" role="region" aria-label="Settings">
     <div class="settings-inner">
       <p class="settings-title">⚙ Settings</p>
-
       <label class="settings-label" for="apiUrl">Google Apps Script URL</label>
-      <p class="settings-hint">
-        Paste your Apps Script Web App URL here. See <strong>SETUP.md</strong> for step-by-step instructions.
-      </p>
-      <input
-        type="url"
-        class="api-input"
-        id="apiUrl"
-        placeholder="https://script.google.com/macros/s/..."
-        autocomplete="off"
-        spellcheck="false"
-      >
+      <p class="settings-hint">Paste your V2 Web App URL. See <strong>SETUP.md</strong> for steps.</p>
+      <input type="url" class="api-input" id="apiUrl" placeholder="https://script.google.com/macros/s/..." autocomplete="off" spellcheck="false">
       <div class="settings-actions">
-        <button class="btn-primary-sm" onclick="saveSettings()" id="saveSettingsBtn">
-          💾 Save URL
-        </button>
-        <button class="btn-secondary-sm" onclick="testConnection()" id="testBtn">
-          🔗 Test
-        </button>
+        <button class="btn-primary-sm" onclick="saveSettings()" id="saveSettingsBtn">💾 Save URL</button>
+        <button class="btn-secondary-sm" onclick="testConnection()" id="testBtn">🔗 Test</button>
       </div>
     </div>
   </div>
 
-  <!-- =========================================
-       SETUP BANNER (first launch)
-       ========================================= -->
+  <!-- ===================== SETUP BANNER ===================== -->
   <div class="setup-banner hidden" id="setupBanner" role="alert">
     <span class="setup-icon">🔧</span>
     <div class="setup-text">
@@ -99,165 +60,385 @@
     <button class="setup-cta" onclick="openSetup()">Setup</button>
   </div>
 
-  <!-- =========================================
-       MAIN FORM
-       ========================================= -->
-  <main class="main" id="main">
-    <form id="expenseForm" novalidate autocomplete="off">
+  <!-- ===================== PAGES ===================== -->
+  <div class="pages-wrapper">
 
-      <!-- DATE + CATEGORY row -->
-      <p class="section-label">When &amp; What</p>
+    <!-- =========== PAGE: ADD EXPENSE =========== -->
+    <div class="page" id="page-add">
+      <form id="expenseForm" novalidate autocomplete="off">
 
-      <!-- Date -->
-      <div class="form-group">
-        <label class="form-label" for="date">
-          <span class="lbl-icon">📅</span> Date
-        </label>
-        <input
-          type="date"
-          class="form-input"
-          id="date"
-          name="date"
-          required
-          aria-required="true"
-          aria-describedby="dateError"
-        >
-        <span class="field-msg" id="dateError" role="alert"></span>
+        <p class="section-label">When &amp; What</p>
+
+        <div class="form-group">
+          <label class="form-label" for="date"><span class="lbl-icon">📅</span> Date</label>
+          <input type="date" class="form-input" id="date" name="date" required aria-required="true" aria-describedby="dateError">
+          <span class="field-msg" id="dateError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="category"><span class="lbl-icon">📂</span> Category</label>
+          <select class="form-input" id="category" name="category" required aria-required="true" aria-describedby="categoryError">
+            <option value="" disabled selected>Select a category…</option>
+            <option value="Utility">🔌 Utility</option>
+            <option value="Groceries">🛒 Groceries</option>
+            <option value="Petrol">⛽ Petrol</option>
+            <option value="Outing">🍽 Outing</option>
+            <option value="Food-Order">🛵 Food-Order</option>
+            <option value="Trip">✈️ Trip</option>
+            <option value="Other">📌 Other</option>
+          </select>
+          <span class="field-msg" id="categoryError" role="alert"></span>
+        </div>
+
+        <p class="section-label">Who Paid?</p>
+
+        <div class="form-group">
+          <div class="user-grid" role="group" aria-label="Select who paid" aria-describedby="userError">
+            <button type="button" class="user-btn" id="btnSmruti" data-user="Smruti" onclick="selectUser('Smruti')" aria-pressed="false">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Smruti</span>
+              <span class="user-sub">Tap to select</span>
+              <span class="check-badge">✓</span>
+            </button>
+            <button type="button" class="user-btn" id="btnSajhni" data-user="Sajhni" onclick="selectUser('Sajhni')" aria-pressed="false">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Sajhni</span>
+              <span class="user-sub">Tap to select</span>
+              <span class="check-badge">✓</span>
+            </button>
+          </div>
+          <span class="field-msg" id="userError" role="alert"></span>
+        </div>
+
+        <p class="section-label">Amount &amp; Note</p>
+
+        <div class="form-group">
+          <label class="form-label" for="amount"><span class="lbl-icon">💵</span> Amount</label>
+          <div class="amount-wrapper">
+            <span class="currency-flag" aria-hidden="true">₹</span>
+            <input type="number" class="form-input amount-input" id="amount" name="amount" placeholder="0.00" min="0.01" step="0.01" inputmode="decimal" required aria-required="true" aria-describedby="amountError">
+          </div>
+          <div class="amount-preview" id="amountPreview" aria-live="polite">
+            <span class="preview-label">Entry for <strong id="previewUser"></strong></span>
+            <span class="preview-value" id="previewAmount"></span>
+          </div>
+          <span class="field-msg" id="amountError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="remark"><span class="lbl-icon">📝</span> Remark <span class="optional-tag">optional</span></label>
+          <div class="remark-wrapper">
+            <textarea class="form-input" id="remark" name="remark" placeholder="Add a short note (e.g. Big Bazaar, weekend trip…)" maxlength="100" rows="3" aria-describedby="charCounter"></textarea>
+            <span class="char-counter" id="charCounter" aria-label="Character count">0/100</span>
+          </div>
+        </div>
+
+      </form>
+    </div><!-- /page-add -->
+
+    <!-- =========== PAGE: DASHBOARD =========== -->
+    <div class="page hidden" id="page-dashboard">
+
+      <!-- Date range filter -->
+      <div class="filter-bar" role="group" aria-label="Date range">
+        <button class="filter-pill active" data-range="month"  onclick="setDashRange('month')"  id="dpill-month">This Month</button>
+        <button class="filter-pill" data-range="7days" onclick="setDashRange('7days')" id="dpill-7days">Last 7 Days</button>
+        <button class="filter-pill" data-range="custom" onclick="setDashRange('custom')" id="dpill-custom">Custom</button>
       </div>
 
-      <!-- Category -->
-      <div class="form-group">
-        <label class="form-label" for="category">
-          <span class="lbl-icon">📂</span> Category
-        </label>
-        <select
-          class="form-input"
-          id="category"
-          name="category"
-          required
-          aria-required="true"
-          aria-describedby="categoryError"
-        >
-          <option value="" disabled selected>Select a category…</option>
-          <option value="Utility">🔌 Utility</option>
-          <option value="Groceries">🛒 Groceries</option>
-          <option value="Petrol">⛽ Petrol</option>
-          <option value="Outing">🍽 Outing</option>
-          <option value="Food-Order">🛵 Food-Order</option>
-          <option value="Trip">✈️ Trip</option>
-          <option value="Other">📌 Other</option>
+      <div class="custom-range-row hidden" id="dashCustomRow">
+        <input type="date" class="form-input range-input" id="dashFrom" aria-label="From date">
+        <span class="range-sep">→</span>
+        <input type="date" class="form-input range-input" id="dashTo" aria-label="To date">
+        <button class="btn-primary-sm range-go" onclick="applyDashCustom()">Go</button>
+      </div>
+
+      <!-- Loading state -->
+      <div class="dash-loading hidden" id="dashLoading">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-chart"></div>
+      </div>
+
+      <!-- No-API state -->
+      <div class="empty-state hidden" id="dashNoApi">
+        <div class="empty-icon">⚙️</div>
+        <div class="empty-title">Setup Required</div>
+        <div class="empty-sub">Open Settings and add your API URL first</div>
+      </div>
+
+      <!-- Dashboard content -->
+      <div id="dashContent">
+        <!-- Summary cards -->
+        <div class="cards-grid">
+          <div class="summary-card card-total">
+            <span class="card-icon">💰</span>
+            <span class="card-label">Total Spend</span>
+            <span class="card-value" id="totalSpend">₹0</span>
+          </div>
+          <div class="summary-card card-txn">
+            <span class="card-icon">🧾</span>
+            <span class="card-label">Transactions</span>
+            <span class="card-value" id="txnCount">0</span>
+          </div>
+          <div class="summary-card card-smruti">
+            <span class="card-icon">👩</span>
+            <span class="card-label">Smruti</span>
+            <span class="card-value" id="smrutiTotal">₹0</span>
+          </div>
+          <div class="summary-card card-sajhni">
+            <span class="card-icon">👩</span>
+            <span class="card-label">Sajhni</span>
+            <span class="card-value" id="sajhniTotal">₹0</span>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-card" id="categoryChartCard">
+          <div class="chart-title">📊 Category Breakdown</div>
+          <div class="chart-empty hidden" id="catChartEmpty">No data for this period</div>
+          <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+        </div>
+
+        <div class="chart-card" id="trendChartCard">
+          <div class="chart-title">📈 Spending Trend</div>
+          <div class="chart-empty hidden" id="trendChartEmpty">No data for this period</div>
+          <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+        </div>
+      </div>
+
+    </div><!-- /page-dashboard -->
+
+    <!-- =========== PAGE: HISTORY =========== -->
+    <div class="page hidden" id="page-history">
+
+      <!-- Common / Personal mode toggle -->
+      <div class="mode-toggle" role="group" aria-label="Expense mode">
+        <button class="mode-btn active" id="modeCommonBtn" onclick="setHistoryMode('common')">🏠 Common</button>
+        <button class="mode-btn" id="modePersonalBtn" onclick="setHistoryMode('personal')">👤 Personal</button>
+      </div>
+
+      <!-- Personal mini-dashboard (only when personal mode active) -->
+      <div class="personal-dash hidden" id="personalDash">
+        <div class="personal-summary-cards">
+          <div class="summary-card card-smruti">
+            <span class="card-label">Smruti Total</span>
+            <span class="card-value" id="perSmrutiTotal">₹0</span>
+          </div>
+          <div class="summary-card card-sajhni">
+            <span class="card-label">Sajhni Total</span>
+            <span class="card-value" id="perSajhniTotal">₹0</span>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">📊 Personal Category Breakdown</div>
+          <div class="chart-empty hidden" id="perCatEmpty">No data for this period</div>
+          <div class="chart-wrap"><canvas id="personalCatChart"></canvas></div>
+        </div>
+        <button class="add-personal-btn" id="addPersonalBtn" onclick="openPersonalModal()">
+          + Add Personal Expense
+        </button>
+      </div>
+
+      <!-- Date range filter -->
+      <div class="filter-bar" role="group" aria-label="Date range">
+        <button class="filter-pill active" data-range="month" onclick="setHistoryRange('month')" id="hpill-month">This Month</button>
+        <button class="filter-pill" data-range="all"   onclick="setHistoryRange('all')"   id="hpill-all">All Time</button>
+        <button class="filter-pill" data-range="custom" onclick="setHistoryRange('custom')" id="hpill-custom">Custom</button>
+      </div>
+
+      <div class="custom-range-row hidden" id="histCustomRow">
+        <input type="date" class="form-input range-input" id="histFrom" aria-label="From date">
+        <span class="range-sep">→</span>
+        <input type="date" class="form-input range-input" id="histTo" aria-label="To date">
+        <button class="btn-primary-sm range-go" onclick="applyHistCustom()">Go</button>
+      </div>
+
+      <!-- Search + category filter -->
+      <div class="hist-filters">
+        <input type="search" class="search-input" id="searchInput" placeholder="🔍  Search remarks or category…" oninput="filterList()" aria-label="Search entries">
+        <select class="filter-select" id="catFilter" onchange="filterList()" aria-label="Filter by category">
+          <option value="">All categories</option>
         </select>
-        <span class="field-msg" id="categoryError" role="alert"></span>
       </div>
 
-      <!-- WHO PAID -->
-      <p class="section-label">Who Paid?</p>
-
-      <div class="form-group">
-        <div class="user-grid" role="group" aria-label="Select who paid" aria-describedby="userError">
-          <button
-            type="button"
-            class="user-btn"
-            id="btnSmruti"
-            data-user="Smruti"
-            onclick="selectUser('Smruti')"
-            aria-pressed="false"
-          >
-            <span class="user-avatar">👩</span>
-            <span class="user-name">Smruti</span>
-            <span class="user-sub">Tap to select</span>
-            <span class="check-badge">✓</span>
-          </button>
-          <button
-            type="button"
-            class="user-btn"
-            id="btnSajhni"
-            data-user="Sajhni"
-            onclick="selectUser('Sajhni')"
-            aria-pressed="false"
-          >
-            <span class="user-avatar">👩</span>
-            <span class="user-name">Sajhni</span>
-            <span class="user-sub">Tap to select</span>
-            <span class="check-badge">✓</span>
-          </button>
-        </div>
-        <span class="field-msg" id="userError" role="alert"></span>
+      <!-- Loading / Empty / List -->
+      <div class="hist-loading hidden" id="histLoading">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
       </div>
 
-      <!-- AMOUNT + REMARK -->
-      <p class="section-label">Amount &amp; Note</p>
-
-      <!-- Amount -->
-      <div class="form-group">
-        <label class="form-label" for="amount">
-          <span class="lbl-icon">💵</span> Amount
-        </label>
-        <div class="amount-wrapper">
-          <span class="currency-flag" aria-hidden="true">₹</span>
-          <input
-            type="number"
-            class="form-input amount-input"
-            id="amount"
-            name="amount"
-            placeholder="0.00"
-            min="0.01"
-            step="0.01"
-            inputmode="decimal"
-            required
-            aria-required="true"
-            aria-describedby="amountError"
-          >
-        </div>
-        <!-- Preview row -->
-        <div class="amount-preview" id="amountPreview" aria-live="polite">
-          <span class="preview-label">Entry for <strong id="previewUser"></strong></span>
-          <span class="preview-value" id="previewAmount"></span>
-        </div>
-        <span class="field-msg" id="amountError" role="alert"></span>
+      <div class="empty-state hidden" id="histEmpty">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No entries found</div>
+        <div class="empty-sub" id="histEmptySub">Try changing the date range or filters</div>
       </div>
 
-      <!-- Remark -->
-      <div class="form-group">
-        <label class="form-label" for="remark">
-          <span class="lbl-icon">📝</span> Remark
-          <span class="optional-tag">optional</span>
-        </label>
-        <div class="remark-wrapper">
-          <textarea
-            class="form-input"
-            id="remark"
-            name="remark"
-            placeholder="Add a short note (e.g. Big Bazaar, weekend trip…)"
-            maxlength="100"
-            rows="3"
-            aria-describedby="charCounter"
-          ></textarea>
-          <span class="char-counter" id="charCounter" aria-label="Character count">0/100</span>
-        </div>
-      </div>
+      <div class="entry-list" id="entryList" role="list" aria-label="Expense entries"></div>
 
-    </form>
-  </main>
+    </div><!-- /page-history -->
 
-  <!-- =========================================
-       FIXED SUBMIT FOOTER
-       ========================================= -->
-  <div class="submit-footer" role="complementary">
-    <button
-      class="submit-btn"
-      id="submitBtn"
-      type="submit"
-      form="expenseForm"
-      aria-label="Save expense entry"
-    >
+  </div><!-- /pages-wrapper -->
+
+  <!-- ===================== SUBMIT FOOTER (Add page only) ===================== -->
+  <div class="submit-footer" id="submitFooter" role="complementary">
+    <button class="submit-btn" id="submitBtn" type="submit" form="expenseForm" aria-label="Save expense entry">
       <span id="submitLabel"><span>💾</span> Save Expense</span>
     </button>
   </div>
 
-  <!-- =========================================
-       TOAST NOTIFICATION
-       ========================================= -->
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-btn active" id="nav-add" onclick="switchTab('add')" aria-label="Add Expense">
+      <span class="nav-icon">➕</span>
+      <span class="nav-label">Add</span>
+    </button>
+    <button class="nav-btn" id="nav-dashboard" onclick="switchTab('dashboard')" aria-label="Dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="switchTab('history')" aria-label="History">
+      <span class="nav-icon">🗒️</span>
+      <span class="nav-label">History</span>
+    </button>
+  </nav>
+
+  <!-- ===================== EDIT MODAL ===================== -->
+  <div class="modal-overlay hidden" id="editModal" role="dialog" aria-modal="true" aria-label="Edit Expense" onclick="handleOverlayClick(event,'editModal')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Entry</h2>
+        <button class="modal-close" onclick="closeEditModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        <input type="hidden" id="editType">
+
+        <div class="form-group">
+          <label class="form-label" for="editDate"><span class="lbl-icon">📅</span> Date</label>
+          <input type="date" class="form-input" id="editDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editCategory"><span class="lbl-icon">📂</span> Category</label>
+          <select class="form-input" id="editCategory">
+            <option value="" disabled>Select category…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="lbl-icon">👤</span> Who Paid?</label>
+          <div class="user-grid">
+            <button type="button" class="user-btn" data-edit-user="Smruti" onclick="selectEditUser('Smruti')">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Smruti</span>
+              <span class="check-badge">✓</span>
+            </button>
+            <button type="button" class="user-btn" data-edit-user="Sajhni" onclick="selectEditUser('Sajhni')">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Sajhni</span>
+              <span class="check-badge">✓</span>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editAmount"><span class="lbl-icon">💵</span> Amount</label>
+          <div class="amount-wrapper">
+            <span class="currency-flag" aria-hidden="true">₹</span>
+            <input type="number" class="form-input amount-input" id="editAmount" placeholder="0.00" min="0.01" step="0.01" inputmode="decimal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editRemark"><span class="lbl-icon">📝</span> Remark <span class="optional-tag">optional</span></label>
+          <textarea class="form-input" id="editRemark" rows="2" maxlength="100" placeholder="Add a note…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-danger" onclick="openDeleteConfirm()" aria-label="Delete entry">🗑 Delete</button>
+        <button class="btn-modal-save" id="editSaveBtn" onclick="saveEdit()" aria-label="Save changes">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DELETE CONFIRM MODAL ===================== -->
+  <div class="modal-overlay hidden" id="deleteModal" role="dialog" aria-modal="true" aria-label="Confirm Delete" onclick="handleOverlayClick(event,'deleteModal')">
+    <div class="confirm-sheet">
+      <div class="confirm-icon">🗑</div>
+      <h3 class="confirm-title">Delete Entry?</h3>
+      <p class="confirm-sub">This will permanently remove this entry from Google Sheets. This cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary-sm" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-confirm-delete" id="confirmDeleteBtn" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PERSONAL ADD MODAL ===================== -->
+  <div class="modal-overlay hidden" id="personalAddModal" role="dialog" aria-modal="true" aria-label="Add Personal Expense" onclick="handleOverlayClick(event,'personalAddModal')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h2 class="modal-title">👤 Personal Expense</h2>
+        <button class="modal-close" onclick="closePersonalModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label class="form-label"><span class="lbl-icon">👩</span> Who?</label>
+          <div class="user-grid">
+            <button type="button" class="user-btn" data-personal-user="Smruti" onclick="selectPersonalUser('Smruti')">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Smruti</span>
+              <span class="check-badge">✓</span>
+            </button>
+            <button type="button" class="user-btn" data-personal-user="Sajhni" onclick="selectPersonalUser('Sajhni')">
+              <span class="user-avatar">👩</span>
+              <span class="user-name">Sajhni</span>
+              <span class="check-badge">✓</span>
+            </button>
+          </div>
+          <span class="field-msg" id="perUserError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="perDate"><span class="lbl-icon">📅</span> Date</label>
+          <input type="date" class="form-input" id="perDate">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="perCategory"><span class="lbl-icon">📂</span> Category</label>
+          <select class="form-input" id="perCategory">
+            <option value="" disabled selected>Select category…</option>
+            <option value="Food">🍔 Food</option>
+            <option value="E-commerce">🛍 E-commerce</option>
+            <option value="Others">📌 Others</option>
+          </select>
+          <span class="field-msg" id="perCatError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="perAmount"><span class="lbl-icon">💵</span> Amount</label>
+          <div class="amount-wrapper">
+            <span class="currency-flag" aria-hidden="true">₹</span>
+            <input type="number" class="form-input amount-input" id="perAmount" placeholder="0.00" min="0.01" step="0.01" inputmode="decimal">
+          </div>
+          <span class="field-msg" id="perAmtError" role="alert"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="perRemark"><span class="lbl-icon">📝</span> Remark <span class="optional-tag">optional</span></label>
+          <textarea class="form-input" id="perRemark" rows="2" maxlength="100" placeholder="Add a note…"></textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-save full-width" id="submitPersonalBtn" onclick="submitPersonal()">💾 Save Personal Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST ===================== -->
   <div class="toast-container" aria-live="assertive" aria-atomic="true">
     <div class="toast" id="toast" role="status">
       <span class="toast-icon" id="toastIcon"></span>
@@ -270,7 +451,11 @@
 
 </div><!-- /.app -->
 
-<!-- App Script -->
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<!-- API module (must load before app.js) -->
+<script src="./api.js"></script>
+<!-- Main app logic -->
 <script src="./app.js"></script>
 
 </body>
